@@ -8,7 +8,7 @@ import random
 
 class DataGenerator(keras.utils.Sequence):
 
-    def __init__(self, datas, path, batch_size=1, shuffle=True):
+    def __init__(self, datas, path, batch_size=32, shuffle=True):
         self.batch_size = batch_size
         self.datas = datas
         self.indexes = np.arange(len(self.datas))

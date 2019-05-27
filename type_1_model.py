@@ -5,7 +5,7 @@ from keras.models import Model,Sequential
 from keras.regularizers import l2
 from keras.losses import binary_crossentropy
 from keras.optimizers import Adam
-
+from keras.layers import concatenate
 
 def W_init(shape,name=None):
     """Initialize weights as in paper"""
@@ -55,5 +55,5 @@ def build_model():
 
     optimizer = Adam(0.00006)
     #//TODO: get layerwise learning rates and momentum annealing scheme described in paperworking
-    siamese_net.compile(loss="binary_crossentropy",optimizer=optimizer,metrics=['accuracy'])
+    siamese_net.compile(loss="binary_crossentropy",optimizer=optimizer,metrics=['binary_accuracy'])
     return siamese_net
