@@ -55,5 +55,5 @@ def build_model():
 
     optimizer = Adam(0.00006)
     #//TODO: get layerwise learning rates and momentum annealing scheme described in paperworking
-    siamese_net.compile(loss="binary_crossentropy",optimizer=optimizer)
+    siamese_net.compile(loss="binary_crossentropy",optimizer=optimizer,metrics=['accuracy'])
     return siamese_net

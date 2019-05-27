@@ -4,15 +4,17 @@ import keras
 import math
 import itertools
 from PIL import Image
+import random
+
 class DataGenerator(keras.utils.Sequence):
 
-    def __init__(self, datas, batch_size=1, shuffle=True):
+    def __init__(self, datas, path, batch_size=1, shuffle=True):
         self.batch_size = batch_size
         self.datas = datas
         self.indexes = np.arange(len(self.datas))
         self.shuffle = shuffle
-        self.path = '/Users/lvyufeng/Documents/captcha_train_set/type1_train/{}'
-        self.index_list = [1,2,3,4,5,6,7,8,9]
+        self.path = path
+
     def __len__(self):
         #计算每一个epoch的迭代次数
         return math.ceil(len(self.datas) / float(self.batch_size))
@@ -42,21 +44,23 @@ class DataGenerator(keras.utils.Sequence):
         # 生成数据
         for i, data in enumerate(batch_datas):
             #x_train数据
-            cat_images_t, images_t, labels_t = self.get_data(self.path.format(data[0]),data[1],perm_list)
+            cat_images_t, images_t, labels_t = self.get_data(self.path.format(data[0]),data[1],perm_list,'train')
             cat_images.extend(cat_images_t)
             images.extend(images_t)
             labels.extend(labels_t)
         return [np.array(cat_images),np.array(images)], np.array(labels)
 
-    def get_permutations(self):
+    @staticmethod
+    def get_permutations():
         perm_list = []
-        for i in itertools.permutations(self.index_list, 4):
+        index_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        for i in itertools.permutations(index_list, 4):
             t = ''.join([str(j) for j in i])
             # t = int(t)
             perm_list.append(t)
         return perm_list
-
-    def get_data(self,path, index, perm_list):
+    @staticmethod
+    def get_data(path, index, perm_list, mode):
         # img = Image.open(path)
         img = np.array(Image.open(path).convert('L'), 'f')
         img[img >= 200] = 255
@@ -69,28 +73,72 @@ class DataGenerator(keras.utils.Sequence):
             imgs[str(i + 1)] = img[y[i]:y[i] + 32, x[i]:x[i] + 32]
 
         img = img[125:157, 10:img.shape[1] - 15]
-        img = np.expand_dims(img,-1)
+        # img = np.expand_dims(img,-1)
         cat_images = []
         images = []
         labels = []
-
-        for i in perm_list:
+        res = []
+        t = perm_list.copy()
+        t.remove(index)
+        if mode == 'train':
+            res = random.sample(t,5)
+            # labels.append(0)
+            # cat_images.append(pic)
+            # images.append(img)
+        elif mode == 'valid':
+            # labels.append(0)
+            res = random.sample(t,1)
+            # cat_images.append(pic)
+            # images.append(img)
+        for i in res:
             matrix = [imgs[j] for j in i]
             pic = np.concatenate(matrix, axis=1)
-            pic = np.expand_dims(pic,-1)
             cat_images.append(pic)
             images.append(img)
-            if i == index:
-                labels.append(1)
-                # print(pic.shape)
-                # pic = pic.astype('uint8')
-                # pic = Image.fromarray(pic)
-                # pic.show()
-                # pic.save('cat.jpg')
-            else:
-                labels.append(0)
+            labels.append(0)
+        matrix = [imgs[j] for j in index]
+        pic = np.concatenate(matrix, axis=1)
+        cat_images.append(pic)
+        images.append(img)
+        labels.append(1)
 
+        cat_images = np.expand_dims(cat_images,-1)
+        images = np.expand_dims(images,-1)
+
+
+            # if i == index:
+            #     labels.append(1)
+            #     cat_images.append(pic)
+            #     images.append(img)
+            #     # print(pic.shape)
+            #     # pic = pic.astype('uint8')
+            #     # pic = Image.fromarray(pic)
+            #     # pic.show()
+            #     # pic.save('cat.jpg')
+            # else:
+            #     if mode == 'train':
+            #         labels.append(0)
+            #         cat_images.append(pic)
+            #         images.append(img)
+            #     elif mode == 'valid' and count == 0:
+            #         labels.append(0)
+            #         cat_images.append(pic)
+            #         images.append(img)
+            #     count += 1
         # img = img[125:157, 10:img.shape[1] - 15]
         # imgs = [img] * len(pics)
 
         return cat_images,images, labels
+
+def get_valid(valid_data,path):
+    cat_images = []
+    images = []
+    labels = []
+    perm_list = DataGenerator.get_permutations()
+    for i, data in enumerate(valid_data):
+        # x_train数据
+        cat_images_t, images_t, labels_t = DataGenerator.get_data(path.format(data[0]), data[1], perm_list,'valid')
+        cat_images.extend(cat_images_t)
+        images.extend(images_t)
+        labels.extend(labels_t)
+    return [np.array(cat_images), np.array(images)], np.array(labels)

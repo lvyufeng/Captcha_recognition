@@ -22,13 +22,17 @@ def get_permutations():
 perm_list = get_permutations()
 
 def read_csv(path):
-    lines = []
+    train_data = []
+    valid_data = []
     csv_file = csv.reader(open(path,'r',encoding='utf-8'))
-    for i in csv_file:
-        lines.append(i)
-    return lines
+    for index,i in enumerate(csv_file):
+        if index <= 19500:
+            train_data.append(i)
+        else:
+            valid_data.append(i)
+    return train_data,valid_data
 
-def get_data(path,index,perm_list):
+def get_data(path,index,perm_list,mode):
     # img = Image.open(path)
     img = np.array(Image.open(path).convert('L'), 'f')
     img[img >= 200] = 255
