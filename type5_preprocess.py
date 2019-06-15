@@ -12,6 +12,7 @@ class processed_image():
         img = self.img.astype('uint8')
         img = Image.fromarray(img)
         img.show()
+        img.save('type5_cutline.png')
 
     def get_all_lines(self):
         i = 0

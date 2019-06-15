@@ -3,7 +3,7 @@ from type_1_model import build_model
 from type_1_loader import DataGenerator,get_valid
 
 path = '/home/ubuntu/dataset/type1_train/{}'
-# path = '/Users/lvyufeng/Documents/captcha_train_set/type1_train/{}'
+# path = '/Users/lvyufeng/Documents/captcha_train_set/type1_train/{type1_train_19990.jpg}'
 train_data,valid_data = read_csv(path.format('type1_train.csv'))
 
 training_generator = DataGenerator(train_data,path)
